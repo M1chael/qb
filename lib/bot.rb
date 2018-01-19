@@ -15,7 +15,7 @@ class Bot
     Telegram::Bot::Client.run(@token) do |telegram| 
       @response = telegram.api.send_message(chat_id: @chat_id, text: quote.text, reply_markup: markup(quote.score))
     end
-    # DB[:images].where(link: image.link).update(rating: 0, 
-    #   mid: @response['result']['message_id'], fid: @response['result']['photo'][-1]['file_id'])
+    DB[:quotes].where(id: quote.id).update(post_count: quote.post_count + 1, post_date: Time.now.to_i)
+    DB[:messages].insert(mid: @response['result']['message_id'], qid: quote.id)
   end
 end
