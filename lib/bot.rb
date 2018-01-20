@@ -1,3 +1,4 @@
+require 'quote'
 require 'telegram/bot'
 
 class Bot

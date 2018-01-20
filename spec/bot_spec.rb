@@ -1,5 +1,4 @@
 require 'bot'
-require 'quote'
 require 'spec_helper'
 
 describe Bot do
