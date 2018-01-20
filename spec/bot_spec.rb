@@ -19,6 +19,7 @@ describe Bot do
       with(text: vote, callback_data: 'thx').and_return('rb')
     allow(Telegram::Bot::Types::InlineKeyboardMarkup).to receive(:new).
       with(inline_keyboard: [['lb', 'rb']]).and_return('markup')
+    allow(quote).to receive(:posted)
   end
 
   describe '#post' do
@@ -32,21 +33,26 @@ describe Bot do
     it 'sends quote to channel' do
       expect(Telegram::Bot::Client).to receive(:run).with(token).and_yield(telegram)
       expect(telegram).to receive(:api)
-      expect(api).to receive(:send_message).with(chat_id: chat_id, text: text, reply_markup: 'markup')
+      msg = "#{text}\n\n#{author}\n\"#{book}\""
+      expect(api).to receive(:send_message).with(chat_id: chat_id, text: msg, reply_markup: 'markup')
       bot.post(quote)
     end
 
-    it 'updates database' do
-      DB[:quotes].delete
-      DB[:messages].delete
-      DB[:quotes].insert(text: 'quote1', author: 0, book: 0, post_count: 0, post_date: 0, score: 0)
-      DB[:quotes].insert(text: text, author: author, book: book, post_count: 0, post_date: 0, score: 0)
-      quotes = DB[:quotes].all
-      quotes[1][:post_count] = post_count + 1
-      quotes[1][:post_date] = post_date
+    # it 'updates database' do
+    #   DB[:quotes].delete
+    #   DB[:messages].delete
+    #   DB[:quotes].insert(text: 'quote1', author: 0, book: 0, post_count: 0, post_date: 0, score: 0)
+    #   DB[:quotes].insert(text: text, author: author, book: book, post_count: 0, post_date: 0, score: 0)
+    #   quotes = DB[:quotes].all
+    #   quotes[1][:post_count] = post_count + 1
+    #   quotes[1][:post_date] = post_date
+    #   bot.post(quote)
+    #   expect(DB[:quotes].all).to eq(quotes)
+    #   expect(DB[:messages].all).to eq([{mid: mid, qid: id}])
+    # end
+    it 'sends message to quote with TG mid' do
+      expect(quote).to receive(:posted).with(mid)
       bot.post(quote)
-      expect(DB[:quotes].all).to eq(quotes)
-      expect(DB[:messages].all).to eq([{mid: mid, qid: id}])
     end
   end
 end

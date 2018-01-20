@@ -6,11 +6,13 @@ class Bot
 	end
 
   def post(quote)
-    Telegram::Bot::Client.run(@token) do |telegram| 
-      @response = telegram.api.send_message(chat_id: @chat_id, text: quote.text, reply_markup: markup(quote.score))
+    Telegram::Bot::Client.run(@token) do |telegram|
+      text = "#{quote.text}\n\n#{quote.author}\n\"#{quote.book}\""
+      @response = telegram.api.send_message(chat_id: @chat_id, text: text, reply_markup: markup(quote.score))
     end
-    DB[:quotes].where(id: quote.id).update(post_count: quote.post_count + 1, post_date: Time.now.to_i)
-    DB[:messages].insert(mid: @response['result']['message_id'], qid: quote.id)
+    quote.posted(@response['result']['message_id'])
+    # DB[:quotes].where(id: quote.id).update(post_count: quote.post_count + 1, post_date: Time.now.to_i)
+    # DB[:messages].insert(mid: @response['result']['message_id'], qid: quote.id)
   end
 
   private
