@@ -21,6 +21,8 @@ class Quote
   end
 
   def message=(message)
-
+    @post_date = Time.now.to_i
+    DB[:quotes].where(id: @id).update(post_date: @post_date)
+    DB[:messages].insert(mid: message, qid: @id)
   end
 end

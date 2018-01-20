@@ -26,7 +26,6 @@ describe Bot do
       allow(telegram).to receive(:api).and_return(api)
       allow(api).to receive(:send_message).and_return(response)
       allow(Telegram::Bot::Client).to receive(:run).with(token).and_yield(telegram)
-      allow(Time).to receive(:now) {post_date}
     end
 
     it 'sends quote to channel' do
