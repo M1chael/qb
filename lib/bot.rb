@@ -14,6 +14,22 @@ class Bot
     quote.message = @response['result']['message_id']
   end
 
+  def callback(options)
+    quote = Quote.new(options[:mid])
+    Telegram::Bot::Client.run(@token) do |telegram| 
+      if options[:data] == 'vote'
+        if quote.feedback(options[:uid])
+          text = 'Спасибо'
+          telegram.api.edit_message_reply_markup(chat_id: @chat_id, message_id: options[:mid], 
+            reply_markup: markup(quote.score))
+        else
+          text = 'Вы уже выразили признательность за эту цитату'
+        end
+        telegram.api.answer_callback_query(callback_query_id: options[:id], text: text)
+      end
+    end
+  end
+
   private
 
   def markup(score)
