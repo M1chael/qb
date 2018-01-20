@@ -3,13 +3,20 @@ require 'sequel'
 class Quote
   attr_reader :id, :text, :author, :book, :post_date, :post_count, :score
 
-  def initialize
-    count = (DB[:quotes].count / 10.to_f).ceil
-    post_count = rand(99) > 29 ? '' : 'post_count,'
-    DB["SELECT * FROM quotes WHERE id IN (SELECT id FROM quotes ORDER BY 
-      #{post_count} post_date, id LIMIT #{count}) ORDER BY RANDOM();"].
-      all.first.each do |name, value|
-        instance_variable_set("@#{name}", value)
+  def initialize(message = nil)
+    if message.nil?
+      count = (DB[:quotes].count / 10.to_f).ceil
+      post_count = rand(99) > 29 ? '' : 'post_count,'
+      DB["SELECT * FROM quotes WHERE id IN (SELECT id FROM quotes ORDER BY 
+        #{post_count} post_date, id LIMIT #{count}) ORDER BY RANDOM();"].
+        all.first.each do |name, value|
+          instance_variable_set("@#{name}", value)
+      end
+    else
+      id = DB[:messages][mid: message][:qid]
+      DB[:quotes][id: id].each do |name, value|
+          instance_variable_set("@#{name}", value)
+      end
     end
   end
 
@@ -17,5 +24,6 @@ class Quote
     @post_date = Time.now.to_i
     @post_count += 1
     DB[:quotes].where(id: @id).update(post_date: @post_date, post_count: @post_count)
+    DB[:messages].insert(mid: message, qid: @id)
   end
 end
