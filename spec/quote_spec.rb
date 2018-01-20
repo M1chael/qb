@@ -56,22 +56,53 @@ describe Quote do
     end
   end
 
-  describe '#feedbacked?' do
+  describe '#feedback' do
     before(:example) do
       DB[:feedback].delete
       DB[:feedback].insert(mid: 1, uid: 1)
       DB[:feedback].insert(mid: 2, uid: 2)
       DB[:feedback].insert(mid: 3, uid: 1)
+      @quote = Quote.new(1)
     end
 
-    it 'returns true for quote feedbacked by user through message' do
-      quote = Quote.new(1)
-      expect(quote.feedbacked?(1)).to be true
+    context 'when quote feedbacked' do
+      before(:example) do
+        @result = @quote.feedback(1)
+      end
+
+      it 'returns true for quote feedbacked by user through message' do
+        expect(@result).to be true
+      end
+
+      it 'does not increase score of quote' do
+        expect(@quote.score).to eq(0)
+      end
+
+      it 'does not increase score of quote in DB' do
+        expect(DB[:quotes][id: 1][:score]).to eq(0)
+      end
     end
 
-    it 'returns false for quote not feedbacked by user through message' do
-      quote = Quote.new(1)
-      expect(quote.feedbacked?(2)).to be false
+    context 'when quote feedbacked' do
+      before(:example) do
+        @result = @quote.feedback(2)
+      end
+
+      it 'returns false for quote not feedbacked by user through message' do
+        expect(@result).to be false
+      end
+
+      it 'increases score of quote' do
+        expect(@quote.score).to eq(1)
+      end
+
+      it 'increases score of quote in DB' do
+        expect(DB[:quotes][id: 1][:score]).to eq(1)
+      end
+
+      it 'saves feedback to DB' do
+        expect(DB[:feedback][mid: 1, uid: 2]).not_to be_nil
+      end
     end
   end
 end

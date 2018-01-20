@@ -28,7 +28,12 @@ class Quote
     DB[:messages].insert(mid: message, qid: @id)
   end
 
-  def feedbacked?(user)
-    DB[:feedback].where(mid: @message, uid: user).count == 0 ? false : true
+  def feedback(user)
+    if !result = DB[:feedback].where(mid: @message, uid: user).count == 0 ? false : true
+      @score += 1
+      DB[:quotes].where(id: @id).update(score: @score)
+      DB[:feedback].insert(mid: @message, uid: user)
+    end
+    return result
   end
 end
