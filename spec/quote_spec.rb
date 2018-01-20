@@ -4,12 +4,10 @@ require 'spec_helper'
 describe Quote do
   before(:example) do
     DB[:quotes].delete
-    DB[:messages].delete
-    DB[:quotes].insert(id: 1, text: 'quote1', author: 0, book: 0, post_date: 10, score: 0)
-    DB[:quotes].insert(id: 2, text: 'quote2', author: 0, book: 0, post_date: 11, score: 0)
-    DB[:messages].insert(mid: 1, qid: 1)
-    DB[:messages].insert(mid: 2, qid: 1)
-    DB[:messages].insert(mid: 3, qid: 2)
+    DB[:quotes].insert(id: 1, text: 'quote1', author: 0, book: 0, 
+      post_date: 10, post_count: 2, score: 0)
+    DB[:quotes].insert(id: 2, text: 'quote2', author: 0, book: 0, 
+      post_date: 11, post_count: 1, score: 0)
   end
 
   describe '#new' do
@@ -34,16 +32,14 @@ describe Quote do
       @quote.message = 4
     end
 
-    it 'updates post date of quote' do
-      expect(@quote.post_date).to eq(15)
-    end
+    {post_date: 15, post_count: 2}.each do |name, value|
+      it "updates #{name.to_s.sub('_', ' ')} of quote" do
+        expect(@quote.send(:"#{name}")).to eq(value)
+      end
 
-    it 'updates post date of quote in DB' do
-      expect(DB[:quotes][id: @quote.id][:post_date]).to eq(15)
-    end
-
-    it 'adds message with quote to DB' do
-      expect(DB[:messages][mid: 4][:qid]).to eq(@quote.id)
+      it "updates #{name.to_s.sub('_', ' ')} of quote in DB" do
+        expect(DB[:quotes][id: @quote.id][:"#{name}"]).to eq(value)
+      end
     end
   end
 end
