@@ -19,7 +19,7 @@ describe Bot do
       with(text: vote, callback_data: 'thx').and_return('rb')
     allow(Telegram::Bot::Types::InlineKeyboardMarkup).to receive(:new).
       with(inline_keyboard: [['lb', 'rb']]).and_return('markup')
-    allow(quote).to receive(:posted)
+    allow(quote).to receive(:message=)
   end
 
   describe '#post' do
@@ -51,7 +51,7 @@ describe Bot do
     #   expect(DB[:messages].all).to eq([{mid: mid, qid: id}])
     # end
     it 'sends message to quote with TG mid' do
-      expect(quote).to receive(:posted).with(mid)
+      expect(quote).to receive(:message=).with(mid)
       bot.post(quote)
     end
   end

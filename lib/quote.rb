@@ -1,6 +1,9 @@
 require 'sequel'
 
-class Image
-  attr_reader :text, :author, :book
-  attr_accessor :post_count, :post_date, :score
+class Quote
+  attr_reader :id, :text, :author, :book, :post_count, :post_date, :score
+
+  def message=(message)
+
+  end
 end
