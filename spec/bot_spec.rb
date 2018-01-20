@@ -3,11 +3,11 @@ require 'quote'
 require 'spec_helper'
 
 describe Bot do
-  {mid: 5, vote: 'vote', token: 'telegram_token', chat_id: 'chat_id', id: 2, text: 'text', author: 1, 
-    book: 1, post_count: 0, post_date: 123456, score: 0}.each{ |key, value| let(key) { value } }
+  {mid: 5, vote: 'vote', token: 'telegram_token', chat_id: 'chat_id', id: 2, 
+    text: 'text', author: 1, book: 1, score: 0}.each{ |key, value| let(key) { value } }
   let(:bot) { Bot.new(token: token, chat_id: chat_id, vote: vote) }
-  let(:quote) { instance_double('Quote', id: id, text: text, author: author, book: book, 
-    post_count: post_count, post_date: post_date, score: score) }
+  let(:quote) { instance_double('Quote', id: id, text: text, 
+    author: author, book: book, score: score) }
   let(:telegram) { double }
   let(:api) { double }
   let(:response) { {'result' => {'message_id' => mid}} }
