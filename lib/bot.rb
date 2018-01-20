@@ -16,9 +16,9 @@ class Bot
 
   private
 
-  def markup(thx)
-    kb = [[Telegram::Bot::Types::InlineKeyboardButton.new(text: thx.to_s, callback_data: 'rating'), 
-      Telegram::Bot::Types::InlineKeyboardButton.new(text: @vote, callback_data: 'thx')]]
+  def markup(score)
+    kb = [[Telegram::Bot::Types::InlineKeyboardButton.new(text: score.to_s, callback_data: 'score'), 
+      Telegram::Bot::Types::InlineKeyboardButton.new(text: @vote, callback_data: 'vote')]]
     Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: kb)    
   end
 end

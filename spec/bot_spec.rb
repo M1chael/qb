@@ -13,9 +13,9 @@ describe Bot do
 
   before(:example) do
     allow(Telegram::Bot::Types::InlineKeyboardButton).to receive(:new).
-      with(text: '0', callback_data: 'rating').and_return('lb')
+      with(text: '0', callback_data: 'score').and_return('lb')
     allow(Telegram::Bot::Types::InlineKeyboardButton).to receive(:new).
-      with(text: vote, callback_data: 'thx').and_return('rb')
+      with(text: vote, callback_data: 'vote').and_return('rb')
     allow(Telegram::Bot::Types::InlineKeyboardMarkup).to receive(:new).
       with(inline_keyboard: [['lb', 'rb']]).and_return('markup')
     allow(quote).to receive(:message=)
