@@ -55,4 +55,23 @@ describe Quote do
       end
     end
   end
+
+  describe '#feedbacked?' do
+    before(:example) do
+      DB[:feedback].delete
+      DB[:feedback].insert(mid: 1, uid: 1)
+      DB[:feedback].insert(mid: 2, uid: 2)
+      DB[:feedback].insert(mid: 3, uid: 1)
+    end
+
+    it 'returns true for quote feedbacked by user through message' do
+      quote = Quote.new(1)
+      expect(quote.feedbacked?(1)).to be true
+    end
+
+    it 'returns false for quote not feedbacked by user through message' do
+      quote = Quote.new(1)
+      expect(quote.feedbacked?(2)).to be false
+    end
+  end
 end

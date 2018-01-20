@@ -13,6 +13,7 @@ class Quote
           instance_variable_set("@#{name}", value)
       end
     else
+      @message = message
       id = DB[:messages][mid: message][:qid]
       DB[:quotes][id: id].each do |name, value|
           instance_variable_set("@#{name}", value)
@@ -25,5 +26,9 @@ class Quote
     @post_count += 1
     DB[:quotes].where(id: @id).update(post_date: @post_date, post_count: @post_count)
     DB[:messages].insert(mid: message, qid: @id)
+  end
+
+  def feedbacked?(user)
+    DB[:feedback].where(mid: @message, uid: user).count == 0 ? false : true
   end
 end
