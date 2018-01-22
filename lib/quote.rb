@@ -14,18 +14,24 @@ class Quote
       end
     else
       @message = message
-      id = DB[:messages][mid: message][:qid]
+      id = DB[:messages][mid: message][:eid]
       DB[:quotes][id: id].each do |name, value|
           instance_variable_set("@#{name}", value)
       end
     end
   end
 
+  def text
+    author = DB[:authors][id: @author][:name]
+    book = DB[:books][id: @book][:name]
+    return "#{@text}\n\n#{author}\n\"#{book}\""
+  end
+
   def message=(message)
     @post_date = Time.now.to_i
     @post_count += 1
     DB[:quotes].where(id: @id).update(post_date: @post_date, post_count: @post_count)
-    DB[:messages].insert(mid: message, qid: @id)
+    DB[:messages].insert(mid: message, eid: @id)
   end
 
   def feedback(user)

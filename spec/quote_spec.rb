@@ -9,9 +9,11 @@ describe Quote do
       post_date: 10, post_count: 2, score: 0)
     DB[:quotes].insert(id: 2, text: 'quote2', author: 0, book: 0, 
       post_date: 11, post_count: 1, score: 0)
-    DB[:messages].insert(mid: 1, qid: 1)
-    DB[:messages].insert(mid: 2, qid: 1)
-    DB[:messages].insert(mid: 3, qid: 2)
+    DB[:messages].insert(mid: 1, eid: 1)
+    DB[:messages].insert(mid: 2, eid: 1)
+    DB[:messages].insert(mid: 3, eid: 2)
+    DB[:authors].insert(id: 0, name: 'author')
+    DB[:books].insert(id: 0, name: 'book')
   end
 
   describe '#new' do
@@ -33,6 +35,13 @@ describe Quote do
     end
   end
 
+  describe '#text' do
+    it 'returns quote text, author and book name' do
+      quote = Quote.new(1)
+      expect(quote.text).to eq("quote1\n\nauthor\n\"book\"")
+    end
+  end
+
   describe '#message=' do
     before(:example) do
       allow(Time).to receive(:now) { 15 }
@@ -42,7 +51,7 @@ describe Quote do
     end
 
     it 'saves message to DB' do
-      expect(DB[:messages][mid: 4][:qid]).to eq(2)
+      expect(DB[:messages][mid: 4][:eid]).to eq(2)
     end
 
     {post_date: 15, post_count: 2}.each do |name, value|
