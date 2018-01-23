@@ -15,32 +15,32 @@ describe Post do
     DB[:messages].insert(mid: 3, eid: 2, type: 'post')
     allow(Rss_reader).to receive(:new).and_return(rss)
     allow(rss).to receive(:link).and_return(link)
-    allow(rss).to receive(:pid).and_return(3)
+    allow(rss).to receive(:id).and_return(3)
   end
 
   describe '#new' do
     it 'choose post by TG message id' do
-      post = Post.new(mid: 2, link: link)
+      post = Post.new(2)
       expect(post.score).to eq(1)
     end
   end
 
   describe '#text' do
     it 'returns rss link' do
-      post = Post.new(link: link)
+      post = Post.new
       expect(post.text).to eq(link)
     end
 
     it 'returns nil' do
       allow(rss).to receive(:link).and_return(nil)
-      post = Post.new(link: link)
+      post = Post.new
       expect(post.text).to eq(nil)
     end
   end
 
   describe '#message=' do
     before(:example) do
-      @post = Post.new(link: link)
+      @post = Post.new
       @post.message = 4
     end
 
@@ -67,7 +67,7 @@ describe Post do
       DB[:feedback].insert(mid: 1, uid: 1)
       DB[:feedback].insert(mid: 2, uid: 2)
       DB[:feedback].insert(mid: 3, uid: 1)
-      @post = Post.new(link: link, mid: 1)
+      @post = Post.new(1)
     end
 
     context 'when post feedbacked' do

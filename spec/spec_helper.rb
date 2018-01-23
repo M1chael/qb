@@ -4,6 +4,7 @@ require 'webmock/rspec'
 require 'sequel'
 
 DB = Sequel.sqlite(File.expand_path('../../assets/quotes.db', __FILE__))
+LINK = 'https://alex-rozoff.livejournal.com/data/rss'
 
 WebMock.disable_net_connect!(allow_localhost: true)
 

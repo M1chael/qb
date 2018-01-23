@@ -4,15 +4,15 @@ require 'rss_reader'
 class Post
   attr_reader :text, :score
 
-  def initialize(options)
-    rss = Rss_reader.new(options[:link])
+  def initialize(message = nil)
+    rss = Rss_reader.new(LINK)
 
-    if options[:mid].nil?
-      @id = rss.pid
+    if message.nil?
+      @id = rss.id
       @score = 0
       @link = rss.link
     else
-      @message = options[:mid]
+      @message = message
       id = DB[:messages][mid: @message][:eid]
       DB[:posts][id: id].each do |name, value|
         instance_variable_set("@#{name}", value)
