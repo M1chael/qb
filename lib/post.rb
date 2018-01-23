@@ -15,7 +15,7 @@ class Post
       @message = options[:mid]
       id = DB[:messages][mid: @message][:eid]
       DB[:posts][id: id].each do |name, value|
-          instance_variable_set("@#{name}", value)
+        instance_variable_set("@#{name}", value)
       end
     end
   end

@@ -31,7 +31,7 @@ class Quote
     @post_date = Time.now.to_i
     @post_count += 1
     DB[:quotes].where(id: @id).update(post_date: @post_date, post_count: @post_count)
-    DB[:messages].insert(mid: message, eid: @id)
+    DB[:messages].insert(mid: message, eid: @id, type: 'quote')
   end
 
   def feedback(user)

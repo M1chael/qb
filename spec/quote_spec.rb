@@ -54,6 +54,10 @@ describe Quote do
       expect(DB[:messages][mid: 4][:eid]).to eq(2)
     end
 
+    it 'saves message to DB with "quote" type' do
+      expect(DB[:messages][mid: 4][:type]).to eq('quote')
+    end
+
     {post_date: 15, post_count: 2}.each do |name, value|
       it "updates #{name.to_s.sub('_', ' ')} of quote" do
         expect(@quote.send(:"#{name}")).to eq(value)
