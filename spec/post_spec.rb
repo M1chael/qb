@@ -8,11 +8,11 @@ describe Post do
   before(:example) do
     DB[:posts].delete
     DB[:messages].delete
-    DB[:posts].insert(id: 1, score: 1)
-    DB[:posts].insert(id: 2, score: 2)
-    DB[:messages].insert(mid: 1, eid: 1, type: 'post')
-    DB[:messages].insert(mid: 2, eid: 1, type: 'post')
-    DB[:messages].insert(mid: 3, eid: 2, type: 'post')
+    DB[:posts].insert(id: 11, score: 1)
+    DB[:posts].insert(id: 21, score: 2)
+    DB[:messages].insert(mid: 1, eid: 11, type: 'post')
+    DB[:messages].insert(mid: 2, eid: 11, type: 'post')
+    DB[:messages].insert(mid: 3, eid: 21, type: 'post')
     allow(Rss_reader).to receive(:new).and_return(rss)
     allow(rss).to receive(:link).and_return(link)
     allow(rss).to receive(:id).and_return(3)
@@ -51,63 +51,7 @@ describe Post do
     it 'saves post to DB with 0 score' do
       expect(DB[:posts][id: 3][:score]).to eq(0)
     end
-
-    it 'saves message to DB' do
-      expect(DB[:messages][mid: 4][:eid]).to eq(3)
-    end
-
-    it 'saves message to DB with "post" type' do
-      expect(DB[:messages][mid: 4][:type]).to eq('post')
-    end
   end
 
-  describe '#feedback' do
-    before(:example) do
-      DB[:feedback].delete
-      DB[:feedback].insert(mid: 1, uid: 1)
-      DB[:feedback].insert(mid: 2, uid: 2)
-      DB[:feedback].insert(mid: 3, uid: 1)
-      @post = Post.new(1)
-    end
-
-    context 'when post feedbacked' do
-      before(:example) do
-        @result = @post.feedback(1)
-      end
-
-      it 'returns true for post feedbacked by user through message' do
-        expect(@result).to be true
-      end
-
-      it 'does not increase score of post' do
-        expect(@post.score).to eq(1)
-      end
-
-      it 'does not increase score of post in DB' do
-        expect(DB[:posts][id: 1][:score]).to eq(1)
-      end
-    end
-
-    context 'when post feedbacked' do
-      before(:example) do
-        @result = @post.feedback(2)
-      end
-
-      it 'returns false for post not feedbacked by user through message' do
-        expect(@result).to be false
-      end
-
-      it 'increases score of post' do
-        expect(@post.score).to eq(2)
-      end
-
-      it 'increases score of post in DB' do
-        expect(DB[:posts][id: 1][:score]).to eq(2)
-      end
-
-      it 'saves feedback to DB' do
-        expect(DB[:feedback][mid: 1, uid: 2]).not_to be_nil
-      end
-    end
-  end
+  it_behaves_like 'a Message'
 end

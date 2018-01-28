@@ -1,9 +1,12 @@
-require 'sequel'
+require 'message'
 
-class Quote
+class Quote < Message
   attr_reader :id, :text, :author, :book, :post_date, :post_count, :score
 
   def initialize(message = nil)
+    @table = :quotes
+    @type = 'quote'
+    
     if message.nil?
       count = (DB[:quotes].count / 10.to_f).ceil
       post_count = rand(99) > 29 ? '' : 'post_count,'
@@ -31,15 +34,6 @@ class Quote
     @post_date = Time.now.to_i
     @post_count += 1
     DB[:quotes].where(id: @id).update(post_date: @post_date, post_count: @post_count)
-    DB[:messages].insert(mid: message, eid: @id, type: 'quote')
-  end
-
-  def feedback(user)
-    if !result = DB[:feedback].where(mid: @message, uid: user).count == 0 ? false : true
-      @score += 1
-      DB[:quotes].where(id: @id).update(score: @score)
-      DB[:feedback].insert(mid: @message, uid: user)
-    end
-    return result
+    super
   end
 end
