@@ -1,6 +1,7 @@
 require 'sequel'
 require 'rss'
 require 'uri'
+require 'net/http'
 
 class Rss_reader
   attr_reader :link, :id

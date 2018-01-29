@@ -4,7 +4,8 @@ require 'spec_helper'
 describe Bot do
   {mid: 5, vote: 'vote', token: 'telegram_token', chat_id: 'chat_id', 
     text: "text\n\n1\n\"1\"", text2: "text2\n\n1\n\"1\"", score: 0}.each{ |key, value| let(key) { value } }
-  let(:bot) { Bot.new(token: token, chat_id: chat_id, vote: vote) }
+  let(:logger) { double }
+  let(:bot) { Bot.new(token: token, chat_id: chat_id, vote: vote, logger: logger) }
   let(:quote) { instance_double('Quote', text: text, score: score) }
   let(:post) { instance_double('Post', text: text2, score: score) }
   let(:types) { {post: {object: post, text: text2}, quote: {object: quote, text: text}} }
@@ -24,13 +25,15 @@ describe Bot do
     allow(post).to receive(:message=)
     allow(Message_factory).to receive(:new).and_return(message_factory)
     allow(message_factory).to receive(:get_message)
+    allow(Telegram::Bot::Client).to receive(:run).with(token, logger: logger).and_yield(telegram)
+    allow(logger).to receive(:info)
+    allow(telegram).to receive(:api).and_return(api)
+    allow(telegram).to receive(:logger).and_return(logger)
   end
 
   describe '#post' do
     before(:example) do
-      allow(telegram).to receive(:api).and_return(api)
       allow(api).to receive(:send_message).and_return(response)
-      allow(Telegram::Bot::Client).to receive(:run).with(token).and_yield(telegram)
     end
 
     [:post, :quote].each do |type|
@@ -69,11 +72,9 @@ describe Bot do
       allow(message).to receive(:id).and_return(@id)
       allow(message).to receive(:message).and_return(@msg_id)
       allow(message).to receive(:from).and_return(@from_id)
-      allow(telegram).to receive(:listen).and_return(message)
-      allow(telegram).to receive(:api).and_return(api)
       allow(api).to receive(:answer_callback_query)
       allow(api).to receive(:edit_message_reply_markup)
-      allow(Telegram::Bot::Client).to receive(:run).with(token).and_yield(telegram)
+      allow(telegram).to receive(:listen).and_return(message)
       allow(Telegram::Bot::Types::InlineKeyboardButton).to receive(:new).
         with(text: '10', callback_data: 'score').and_return('lb10')      
       allow(Telegram::Bot::Types::InlineKeyboardButton).to receive(:new).

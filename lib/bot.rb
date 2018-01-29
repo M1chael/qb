@@ -9,25 +9,34 @@ class Bot
 
   def post(type)
     msg = @message_factory.get_message(type: type)
-    Telegram::Bot::Client.run(@token) do |telegram|
-      @response = telegram.api.send_message(chat_id: @chat_id, text: msg.text, reply_markup: markup(msg.score))
+    begin
+      Telegram::Bot::Client.run(@token, logger: @logger) do |telegram|
+        @response = telegram.api.send_message(chat_id: @chat_id, text: msg.text, reply_markup: markup(msg.score))
+        telegram.logger.info("#{type} with message_id #{@response['result']['message_id']} sended")
+      end
+      msg.message = @response['result']['message_id']
+    rescue => error
+      @logger.fatal(error)
     end
-    msg.message = @response['result']['message_id']
   end
 
   def callback(options)
     msg = @message_factory.get_message(mid: options[:mid])
-    Telegram::Bot::Client.run(@token) do |telegram| 
-      if options[:data] == 'vote'
-        if msg.feedback(options[:uid])
-          text = 'Спасибо'
-          telegram.api.edit_message_reply_markup(chat_id: @chat_id, message_id: options[:mid], 
-            reply_markup: markup(msg.score))
-        else
-          text = 'Вы уже выразили признательность ранее'
+    begin
+      Telegram::Bot::Client.run(@token, logger: @logger) do |telegram| 
+        if options[:data] == 'vote'
+          if msg.feedback(options[:uid])
+            text = 'Спасибо'
+            telegram.api.edit_message_reply_markup(chat_id: @chat_id, message_id: options[:mid], 
+              reply_markup: markup(msg.score))
+          else
+            text = 'Вы уже выразили признательность ранее'
+          end
+          telegram.api.answer_callback_query(callback_query_id: options[:id], text: text)
         end
-        telegram.api.answer_callback_query(callback_query_id: options[:id], text: text)
       end
+    rescue => error
+      @logger.fatal(error)
     end
   end
 
