@@ -3,13 +3,14 @@ require 'spec_helper'
 
 describe Bot do
   {mid: 5, vote: 'vote', token: 'telegram_token', chat_id: 'chat_id', id: 2, 
-    text: 'text', author: 1, book: 1, score: 0}.each{ |key, value| let(key) { value } }
+    text: "text\n\n1\n\"1\"", author: 1, book: 1, score: 0}.each{ |key, value| let(key) { value } }
   let(:bot) { Bot.new(token: token, chat_id: chat_id, vote: vote) }
   let(:quote) { instance_double('Quote', id: id, text: text, 
     author: author, book: book, post_date: 10, post_count: 1, score: score) }
   let(:telegram) { double }
   let(:api) { double }
   let(:response) { {'result' => {'message_id' => mid}} }
+  let(:message_factory) { instance_double('Message_factory') }
 
   before(:example) do
     allow(Telegram::Bot::Types::InlineKeyboardButton).to receive(:new).
@@ -19,6 +20,8 @@ describe Bot do
     allow(Telegram::Bot::Types::InlineKeyboardMarkup).to receive(:new).
       with(inline_keyboard: [['lb', 'rb']]).and_return('markup')
     allow(quote).to receive(:message=)
+    allow(Message_factory).to receive(:new).and_return(message_factory)
+    allow(message_factory).to receive(:get_message)
   end
 
   describe '#post' do
@@ -26,19 +29,19 @@ describe Bot do
       allow(telegram).to receive(:api).and_return(api)
       allow(api).to receive(:send_message).and_return(response)
       allow(Telegram::Bot::Client).to receive(:run).with(token).and_yield(telegram)
+      allow(message_factory).to receive(:get_message).and_return(quote)
     end
 
     it 'sends quote to channel' do
       expect(Telegram::Bot::Client).to receive(:run).with(token).and_yield(telegram)
       expect(telegram).to receive(:api)
-      msg = "#{text}\n\n#{author}\n\"#{book}\""
-      expect(api).to receive(:send_message).with(chat_id: chat_id, text: msg, reply_markup: 'markup')
-      bot.post(quote)
+      expect(api).to receive(:send_message).with(chat_id: chat_id, text: text, reply_markup: 'markup')
+      bot.post(:quote)
     end
 
     it 'sends message to quote with TG mid' do
       expect(quote).to receive(:message=).with(mid)
-      bot.post(quote)
+      bot.post(:quote)
     end
   end
 
@@ -70,6 +73,7 @@ describe Bot do
         with(text: vote, callback_data: vote).and_return('rb')
       allow(Telegram::Bot::Types::InlineKeyboardMarkup).to receive(:new).
         with(inline_keyboard: [['lb10', 'rb']]).and_return(@markup10)
+      allow(message_factory).to receive(:get_message).and_return(quote)
     end
 
     it 'shows ok-alert for first time vote' do
@@ -81,7 +85,7 @@ describe Bot do
     it 'shows no-vote-alert for re-vote' do
       allow(quote).to receive(:feedback).with(@from_id.id).and_return(false)
       expect(api).to receive(:answer_callback_query).with(callback_query_id: @id, 
-        text: 'Вы уже выразили признательность за эту цитату')
+        text: 'Вы уже выразили признательность ранее')
       bot.callback(data: @data, uid: @from_id.id, mid: @msg_id.message_id, id: @id)
     end
 

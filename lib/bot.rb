@@ -1,29 +1,30 @@
-require 'quote'
+require 'message_factory'
 require 'telegram/bot'
 
 class Bot
 	def initialize(options)
     options.each{ |key, value| instance_variable_set("@#{key}", value) }
+    @message_factory = Message_factory.new
 	end
 
-  def post(quote)
+  def post(type)
+    msg = @message_factory.get_message(type: type)
     Telegram::Bot::Client.run(@token) do |telegram|
-      text = "#{quote.text}\n\n#{quote.author}\n\"#{quote.book}\""
-      @response = telegram.api.send_message(chat_id: @chat_id, text: text, reply_markup: markup(quote.score))
+      @response = telegram.api.send_message(chat_id: @chat_id, text: msg.text, reply_markup: markup(msg.score))
     end
-    quote.message = @response['result']['message_id']
+    msg.message = @response['result']['message_id']
   end
 
   def callback(options)
-    quote = Quote.new(options[:mid])
+    msg = @message_factory.get_message(mid: options[:mid])
     Telegram::Bot::Client.run(@token) do |telegram| 
       if options[:data] == 'vote'
-        if quote.feedback(options[:uid])
+        if msg.feedback(options[:uid])
           text = 'Спасибо'
           telegram.api.edit_message_reply_markup(chat_id: @chat_id, message_id: options[:mid], 
-            reply_markup: markup(quote.score))
+            reply_markup: markup(msg.score))
         else
-          text = 'Вы уже выразили признательность за эту цитату'
+          text = 'Вы уже выразили признательность ранее'
         end
         telegram.api.answer_callback_query(callback_query_id: options[:id], text: text)
       end
