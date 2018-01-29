@@ -1,8 +1,6 @@
 require 'message'
 
 class Quote < Message
-  attr_reader :id, :text, :author, :book, :post_date, :post_count, :score
-
   def initialize(message = nil)
     @table = :quotes
     @type = 'quote'

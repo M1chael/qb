@@ -6,18 +6,21 @@ describe Quote do
     it 'chooses quote, which post date is older in 70% of cases' do
       srand(50)
       quote = Quote.new
-      expect(quote.post_date).to eq(10)
+      text = "quote1\n\nauthor\n\"book\""
+      expect(quote.text).to eq(text)
     end
 
     it 'chooses quote, which post date is older in 30% of cases' do
       srand(10)
       quote = Quote.new
-      expect(quote.post_date).to eq(11)
+      text = "quote2\n\nauthor\n\"book\""
+      expect(quote.text).to eq(text)
     end
 
     it 'choose quote by TG message id' do
       quote = Quote.new(3)
-      expect(quote.id).to eq(2)
+      text = "quote2\n\nauthor\n\"book\""
+      expect(quote.text).to eq(text)
     end
   end
 
@@ -37,12 +40,8 @@ describe Quote do
     end
 
     {post_date: 15, post_count: 2}.each do |name, value|
-      it "updates #{name.to_s.sub('_', ' ')} of quote" do
-        expect(@quote.send(:"#{name}")).to eq(value)
-      end
-
       it "updates #{name.to_s.sub('_', ' ')} of quote in DB" do
-        expect(DB[:quotes][id: @quote.id][:"#{name}"]).to eq(value)
+        expect(DB[:quotes][id: 2][:"#{name}"]).to eq(value)
       end
     end
   end

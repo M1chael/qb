@@ -2,11 +2,12 @@ require 'bot'
 require 'spec_helper'
 
 describe Bot do
-  {mid: 5, vote: 'vote', token: 'telegram_token', chat_id: 'chat_id', id: 2, 
-    text: "text\n\n1\n\"1\"", author: 1, book: 1, score: 0}.each{ |key, value| let(key) { value } }
+  {mid: 5, vote: 'vote', token: 'telegram_token', chat_id: 'chat_id', 
+    text: "text\n\n1\n\"1\"", text2: "text2\n\n1\n\"1\"", score: 0}.each{ |key, value| let(key) { value } }
   let(:bot) { Bot.new(token: token, chat_id: chat_id, vote: vote) }
-  let(:quote) { instance_double('Quote', id: id, text: text, 
-    author: author, book: book, post_date: 10, post_count: 1, score: score) }
+  let(:quote) { instance_double('Quote', text: text, score: score) }
+  let(:post) { instance_double('Post', text: text2, score: score) }
+  let(:types) { {post: {object: post, text: text2}, quote: {object: quote, text: text}} }
   let(:telegram) { double }
   let(:api) { double }
   let(:response) { {'result' => {'message_id' => mid}} }
@@ -20,6 +21,7 @@ describe Bot do
     allow(Telegram::Bot::Types::InlineKeyboardMarkup).to receive(:new).
       with(inline_keyboard: [['lb', 'rb']]).and_return('markup')
     allow(quote).to receive(:message=)
+    allow(post).to receive(:message=)
     allow(Message_factory).to receive(:new).and_return(message_factory)
     allow(message_factory).to receive(:get_message)
   end
@@ -29,19 +31,24 @@ describe Bot do
       allow(telegram).to receive(:api).and_return(api)
       allow(api).to receive(:send_message).and_return(response)
       allow(Telegram::Bot::Client).to receive(:run).with(token).and_yield(telegram)
-      allow(message_factory).to receive(:get_message).and_return(quote)
     end
 
-    it 'sends quote to channel' do
-      expect(Telegram::Bot::Client).to receive(:run).with(token).and_yield(telegram)
-      expect(telegram).to receive(:api)
-      expect(api).to receive(:send_message).with(chat_id: chat_id, text: text, reply_markup: 'markup')
-      bot.post(:quote)
-    end
+    [:post, :quote].each do |type|
+      context "when bot posts #{type}" do
+        before(:example) do
+          allow(message_factory).to receive(:get_message).and_return(types[type][:object])
+        end
 
-    it 'sends message to quote with TG mid' do
-      expect(quote).to receive(:message=).with(mid)
-      bot.post(:quote)
+        it "sends #{type} to channel" do
+          expect(api).to receive(:send_message).with(chat_id: chat_id, text: types[type][:text], reply_markup: 'markup')
+          bot.post(type)
+        end
+
+        it "sends message= to #{type} with TG mid" do
+          expect(types[type][:object]).to receive(:message=).with(mid)
+          bot.post(type)
+        end
+      end
     end
   end
 
