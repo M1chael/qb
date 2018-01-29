@@ -13,6 +13,17 @@ RSpec.configure do |c|
     stub_request(:get, 'https://alex-rozoff.livejournal.com/data/rss').
       with(:headers => {'User-Agent'=>'Telegram bot; 0x22aa2@gmail.com'}).
       to_return(File.read('test/rss.xml'))
+    DB[:quotes].delete
+    DB[:messages].delete
+    DB[:quotes].insert(id: 1, text: 'quote1', author: 0, book: 0, 
+      post_date: 10, post_count: 2, score: 0)
+    DB[:quotes].insert(id: 2, text: 'quote2', author: 0, book: 0, 
+      post_date: 11, post_count: 1, score: 0)
+    DB[:messages].insert(mid: 1, eid: 1)
+    DB[:messages].insert(mid: 2, eid: 1)
+    DB[:messages].insert(mid: 3, eid: 2)
+    DB[:authors].insert(id: 0, name: 'author')
+    DB[:books].insert(id: 0, name: 'book')
   end
 
   c.around(:example) do |example|
