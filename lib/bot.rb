@@ -23,7 +23,8 @@ class Bot
   def callback(options)
     msg = @message_factory.get_message(mid: options[:mid])
     begin
-      Telegram::Bot::Client.run(@token, logger: @logger) do |telegram| 
+      Telegram::Bot::Client.run(@token, logger: @logger) do |telegram|
+        telegram.logger.info("feedback received: #{options.to_s}")
         if options[:data] == 'vote'
           if msg.feedback(options[:uid])
             text = 'Спасибо'
