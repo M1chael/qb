@@ -10,7 +10,7 @@ describe Quote do
       expect(quote.text).to eq(text)
     end
 
-    it 'chooses quote, which post date is older in 30% of cases' do
+    it 'chooses quote, which post count is lesser in 30% of cases' do
       srand(10)
       quote = Quote.new
       text = "quote2\n\nauthor\n\"book\""
