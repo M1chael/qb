@@ -6,11 +6,9 @@ class Quote < Message
     @type = 'quote'
     
     if message.nil?
-      count = (DB[:quotes].count / 10.to_f).ceil
-      post_count = rand(99) > 29 ? '' : 'post_count,'
-      DB["SELECT * FROM quotes WHERE id IN (SELECT id FROM quotes ORDER BY 
-        #{post_count} post_date, id LIMIT #{count}) ORDER BY RANDOM();"].
-        all.first.each do |name, value|
+      query = DB[:quotes].order(:post_date, Sequel.lit('RANDOM()'))
+      query = query.order_prepend(:post_count) if rand(99) < 29
+      query.all.first.each do |name, value|
           instance_variable_set("@#{name}", value)
       end
     else

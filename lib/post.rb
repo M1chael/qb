@@ -2,8 +2,6 @@ require 'message'
 require 'rss_reader'
 
 class Post < Message
-  attr_reader :text, :score
-
   def initialize(message = nil)
     @table = :posts
     @type = 'post'
