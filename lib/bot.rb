@@ -9,14 +9,16 @@ class Bot
 
   def post(type)
     msg = @message_factory.get_message(type: type)
-    begin
-      Telegram::Bot::Client.run(@token, logger: @logger) do |telegram|
-        @response = telegram.api.send_message(chat_id: @chat_id, text: msg.text, reply_markup: markup(msg.score))
-        telegram.logger.info("#{type} with message_id #{@response['result']['message_id']} sended")
+    if !msg.text.nil?
+      begin
+        Telegram::Bot::Client.run(@token, logger: @logger) do |telegram|
+          @response = telegram.api.send_message(chat_id: @chat_id, text: msg.text, reply_markup: markup(msg.score))
+          telegram.logger.info("#{type} with message_id #{@response['result']['message_id']} sended")
+        end
+        msg.message = @response['result']['message_id']
+      rescue => error
+        @logger.fatal(error)
       end
-      msg.message = @response['result']['message_id']
-    rescue => error
-      @logger.fatal(error)
     end
   end
 

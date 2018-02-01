@@ -53,6 +53,13 @@ describe Bot do
         end
       end
     end
+
+    it 'doesn\'t try to send empty message' do
+      allow(message_factory).to receive(:get_message).and_return(post)
+      allow(post).to receive(:text).and_return(nil)
+      expect(api).not_to receive(:send_message)
+      bot.post(:post)
+    end
   end
 
   describe '#callback' do
