@@ -4,12 +4,12 @@ require 'spec_helper'
 describe Rss_reader do
   before(:example) do
     DB[:posts].delete
+    @rss = Rss_reader.new(LINK)
   end
 
   describe '#link' do
     it 'returns last link from rss feed if it is not in DB yet' do
-      rss = Rss_reader.new(LINK)
-      expect(rss.link).to eq('https://alex-rozoff.livejournal.com/45102.html')
+      expect(@rss.link).to eq('https://alex-rozoff.livejournal.com/45102.html')
     end
 
     it 'returns nil if last link already in DB' do
@@ -21,15 +21,19 @@ describe Rss_reader do
 
   describe '#pid' do
     it 'returns post id' do
-      rss = Rss_reader.new(LINK)
-      expect(rss.id).to eq(45102)
+      expect(@rss.id).to eq(45102)
     end
   end
 
   describe '#name' do
     it 'returns channel title' do
-      rss = Rss_reader.new(LINK)
-      expect(rss.name).to eq('Солнечный ветер')
+      expect(@rss.name).to eq('Солнечный ветер')
+    end
+  end
+
+  describe '#title' do
+    it 'returns last item title' do
+      expect(@rss.title).to eq('Борьба с глобальным потеплением, как бизнес-афера. Венера атакует.')
     end
   end
 end
