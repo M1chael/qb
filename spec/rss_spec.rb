@@ -36,4 +36,10 @@ describe Rss_reader do
       expect(@rss.title).to eq('Борьба с глобальным потеплением, как бизнес-афера. Венера атакует.')
     end
   end
+
+  describe '#author' do
+    it 'returns last item author' do
+      expect(@rss.author).to eq('alex_rozoff')
+    end
+  end
 end

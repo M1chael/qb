@@ -4,7 +4,7 @@ require 'uri'
 require 'net/http'
 
 class Rss_reader
-  attr_reader :link, :id, :name, :title
+  attr_reader :link, :id, :name, :title, :author
 
   def initialize(url)
     uri = URI(url)
@@ -15,6 +15,7 @@ class Rss_reader
     link = feed.items.first.link
     @name = feed.channel.title
     @title = feed.items.first.title
+    @author = feed.items.first.author
     @id = link.split('.')[-2].split('/')[-1].to_i
     @link = DB[:posts][id: @id].nil? ? link : nil
   end
