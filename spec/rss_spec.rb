@@ -25,4 +25,11 @@ describe Rss_reader do
       expect(rss.id).to eq(45102)
     end
   end
+
+  describe '#title' do
+    it 'returns channel title' do
+      rss = Rss_reader.new(LINK)
+      expect(rss.title).to eq('Солнечный ветер')
+    end
+  end
 end
