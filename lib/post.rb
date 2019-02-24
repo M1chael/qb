@@ -22,11 +22,23 @@ class Post < Message
   end
 
   def text
-    @rss.nil? ? nil : "[#{@rss.title}](#{@rss.link})\n\n#{@rss.author}\n\"#{@rss.channel}\""
+    if @rss
+      rss = {title: nil, author: nil, channel: nil}
+      rss.each{|field, value| rss[field] = sanitize(@rss.send(field)) }
+      return "<a href=\"#{@rss.link}\">#{rss[:title]}</a>\n\n#{rss[:author]}\n\"#{rss[:channel]}\""
+    else
+      return nil
+    end
   end
 
   def message=(message)
     DB[@table].insert(id: @id, link: @rss.link, score: 0)
     super
+  end
+
+  private
+
+  def sanitize(string)
+    CGI.escapeHTML(string.strip)
   end
 end

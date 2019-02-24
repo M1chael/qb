@@ -29,7 +29,7 @@ describe Post do
     it 'returns last post title as link to the post, LJ author name and LJ channel name' do
       post = Post.new
       expect(post.text).
-        to eq("[#{rss_fields[:title]}](#{rss_fields[:link]})\n\n#{rss_fields[:author]}\n\"#{rss_fields[:channel]}\"")
+        to eq("<a href=\"#{rss_fields[:link]}\">#{rss_fields[:title]}</a>\n\n#{rss_fields[:author]}\n\"#{rss_fields[:channel]}\"")
     end
 
     it 'returns nil' do
