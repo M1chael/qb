@@ -35,10 +35,4 @@ class Post < Message
     DB[@table].insert(id: @id, link: @rss.link, score: 0)
     super
   end
-
-  private
-
-  def sanitize(string)
-    CGI.escapeHTML(string.strip)
-  end
 end
