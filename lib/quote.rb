@@ -21,9 +21,9 @@ class Quote < Message
   end
 
   def text
-    author = sanitize(DB[:authors][id: @author][:name])
-    book = sanitize(DB[:books][id: @book][:name])
-    return "#{@text}\n\n#{author}\n\"#{book}\""
+    author = DB[:authors][id: @author][:name]
+    book = DB[:books][id: @book][:name]
+    return sanitize("#{@text}\n\n#{author}\n\"#{book}\"")
   end
 
   def message=(message)
