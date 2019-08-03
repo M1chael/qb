@@ -16,4 +16,10 @@ class Message
     end
     return result
   end
+
+  protected
+
+  def sanitize(string)
+    CGI.escapeHTML(string.strip)
+  end
 end

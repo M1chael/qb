@@ -2,8 +2,9 @@ require 'post'
 require 'spec_helper'
 
 describe Post do
-  let(:link) { 'http://post.html' }
-  let(:rss) { instance_double('Rss_reader') }
+  let(:rss_fields) { {id: 3, link: 'http://post.html', channel: 'Имя канала', 
+    title: 'Заголовок поста', author: 'alex_rozoff'} }
+  let(:rss) { double }
 
   before(:example) do
     DB[:posts].delete
@@ -13,9 +14,8 @@ describe Post do
     DB[:messages].insert(mid: 1, eid: 11, type: 'post')
     DB[:messages].insert(mid: 2, eid: 11, type: 'post')
     DB[:messages].insert(mid: 3, eid: 21, type: 'post')
-    allow(Rss_reader).to receive(:new).and_return(rss)
-    allow(rss).to receive(:link).and_return(link)
-    allow(rss).to receive(:id).and_return(3)
+    allow_any_instance_of(Rss_reader).to receive(:read_rss).and_return(rss)
+    rss_fields.each{ |field, value| allow(rss).to receive(field).and_return(value) }
   end
 
   describe '#new' do
@@ -26,13 +26,14 @@ describe Post do
   end
 
   describe '#text' do
-    it 'returns rss link' do
+    it 'returns last post title as link to the post, LJ author name and LJ channel name' do
       post = Post.new
-      expect(post.text).to eq(link)
+      expect(post.text).
+        to eq("<a href=\"#{rss_fields[:link]}\">#{rss_fields[:title]}</a>\n\n#{rss_fields[:author]}\n\"#{rss_fields[:channel]}\"")
     end
 
     it 'returns nil' do
-      allow(rss).to receive(:link).and_return(nil)
+      allow_any_instance_of(Rss_reader).to receive(:read_rss).and_return(nil)
       post = Post.new
       expect(post.text).to eq(nil)
     end
@@ -45,7 +46,7 @@ describe Post do
     end
 
     it 'saves post to DB' do
-      expect(DB[:posts][id: 3][:link]).to eq(link)
+      expect(DB[:posts][id: 3][:link]).to eq(rss_fields[:link])
     end
 
     it 'saves post to DB with 0 score' do

@@ -43,7 +43,8 @@ describe Bot do
         end
 
         it "sends #{type} to channel" do
-          expect(api).to receive(:send_message).with(chat_id: chat_id, text: types[type][:text], reply_markup: 'markup')
+          expect(api).to receive(:send_message).with(chat_id: chat_id, text: types[type][:text], 
+            reply_markup: 'markup', parse_mode: 'HTML')
           bot.post(type)
         end
 

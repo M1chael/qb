@@ -23,7 +23,7 @@ class Quote < Message
   def text
     author = DB[:authors][id: @author][:name]
     book = DB[:books][id: @book][:name]
-    return "#{@text}\n\n#{author}\n\"#{book}\""
+    return sanitize("#{@text}\n\n#{author}\n\"#{book}\"")
   end
 
   def message=(message)

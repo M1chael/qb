@@ -12,12 +12,16 @@ class Bot
     if !msg.text.nil?
       begin
         Telegram::Bot::Client.run(@token, logger: @logger) do |telegram|
-          @response = telegram.api.send_message(chat_id: @chat_id, text: msg.text, reply_markup: markup(msg.score))
+          @response = telegram.api.
+            send_message(chat_id: @chat_id, text: msg.text, reply_markup: markup(msg.score), parse_mode: 'HTML')
           telegram.logger.info("#{type} with message_id #{@response['result']['message_id']} sended")
         end
         msg.message = @response['result']['message_id']
       rescue => error
         @logger.fatal(error)
+        # @logger.debug("Message: \"#{msg.text}\"")
+        @logger.debug("Request: {chat_id: #{@chat_id}, text: #{msg.text}, 
+            reply_markup: #{markup(msg.score)}, parse_mode: 'Markdown'}")
       end
     end
   end
