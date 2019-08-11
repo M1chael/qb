@@ -3,20 +3,6 @@ require 'spec_helper'
 
 describe Quote do
   describe '#new' do
-    it 'chooses quote, which post date is older in 70% of cases' do
-      srand(50)
-      quote = Quote.new
-      text = "quote1\n\nauthor\n&quot;book&quot;"
-      expect(quote.text).to eq(text)
-    end
-
-    it 'chooses quote, which post count is lesser in 30% of cases' do
-      srand(10)
-      quote = Quote.new
-      text = "quote2\n\nauthor\n&quot;book&quot;"
-      expect(quote.text).to eq(text)
-    end
-
     it 'choose quote by TG message id' do
       quote = Quote.new(3)
       text = "quote2\n\nauthor\n&quot;book&quot;"
