@@ -1,14 +1,11 @@
 require 'message'
-# require 'byebug'
+
 class Quote < Message
   def initialize(message = nil)
     @table = :quotes
     @type = 'quote'
     
     if message.nil?
-      # byebug
-      # query = DB[:quotes].order(:post_date, Sequel.lit('RANDOM()'))
-      # query = query.order_prepend(:post_count) if rand(99) < 29
       query = DB[:quotes].where(Sequel.lit('`id` IN (SELECT `id` FROM `quotes` ORDER BY `post_count`, 
         RANDOM() LIMIT (SELECT CAST(COUNT(*)*0.3 AS INT)+1 FROM `quotes`))')).order(:post_date)
       query.all.first.each do |name, value|
