@@ -6,9 +6,20 @@ class Quote < Message
     @type = 'quote'
     
     if message.nil?
-      query = DB[:quotes].where(Sequel.lit('`id` IN (SELECT `id` FROM `quotes` ORDER BY `post_count`, 
-        RANDOM() LIMIT (SELECT CAST(COUNT(*)*0.3 AS INT)+1 FROM `quotes`))')).order(:post_date)
-      query.all.first.each do |name, value|
+      chance = rand(10)
+
+      case chance
+      when 0..3
+        query = DB[:quotes].where(Sequel.lit('`id` IN (SELECT `id` FROM `quotes` ORDER BY `post_count`, 
+          RANDOM() LIMIT(SELECT CAST(COUNT(*)*0.3 AS INT)+1 FROM `quotes`))')).order(:post_date)
+      when 4..7
+        query = DB[:quotes].where(Sequel.lit('`id` IN (SELECT `id` FROM `quotes` ORDER BY `post_date` LIMIT 
+          (SELECT CAST(COUNT(*)*0.3 AS INT)+1 FROM `quotes`))')).order(Sequel.lit('`post_count`, RANDOM()'))
+      else
+        query = DB[:quotes].order(Sequel.lit('RANDOM()'))
+      end
+
+      query.first.each do |name, value|
         instance_variable_set("@#{name}", value)
       end
     else
