@@ -20,8 +20,7 @@ describe Quote do
   describe '#message=' do
     before(:example) do
       allow(Time).to receive(:now) { 15 }
-      srand(10)
-      @quote = Quote.new
+      @quote = Quote.new(3)
       @quote.message = 4
     end
 
