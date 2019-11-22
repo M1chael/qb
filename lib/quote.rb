@@ -9,10 +9,10 @@ class Quote < Message
       chance = rand(10)
 
       case chance
-      when 0..3
+      when 0..1
         query = DB[:quotes].where(Sequel.lit('`id` IN (SELECT `id` FROM `quotes` ORDER BY `post_count`, 
           RANDOM() LIMIT(SELECT CAST(COUNT(*)*0.3 AS INT)+1 FROM `quotes`))')).order(:post_date)
-      when 4..7
+      when 2..7
         query = DB[:quotes].where(Sequel.lit('`id` IN (SELECT `id` FROM `quotes` ORDER BY `post_date` LIMIT 
           (SELECT CAST(COUNT(*)*0.3 AS INT)+1 FROM `quotes`))')).order(Sequel.lit('`post_count`, RANDOM()'))
       else
