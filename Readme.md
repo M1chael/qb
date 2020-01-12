@@ -103,13 +103,13 @@ score INTEGER DEFAULT 0
 Запускается с одним из обязательных параметров:
 * -r, --rss - проверить наличие нового сообщения в RSS-ленте и отправить его в канал
 
-  1. Запускается по расписанию, например, через cron: `11 * * * * /usr/bin/flock -n /tmp/postercron.lck /home/user/path/to/bin/poster.rb -r`
+  1. Запускается по расписанию, например, [через cron](https://github.com/M1chael/qb/wiki/Cron)
   2. Скачивает rss с сайта, чтобы узнать id крайней записи
   3. Если запись с этим id уже есть в БД, завершается
   4. Иначе отправляет сообщение в канал со ссылкой на крайнюю запись и сохраняет её id в БД
 * -q, --quote - запостить случайную цитату в канал
 
-  1. Запускается по расписанию, например, через cron: `11 11 * * * /usr/bin/flock -n /tmp/postercron.lck /home/user/path/to/bin/poster.rb -q`
+  1. Запускается по расписанию, например, [через cron](https://github.com/M1chael/qb/wiki/Cron)
   2. Выбирает случайную цитату из БД следующим образом:
     - в 20% случаев:
       - цитаты упорядочиваются по количеству постов в Telegram;
@@ -130,33 +130,7 @@ score INTEGER DEFAULT 0
 
 ### listener.rb
 
-0. Запускается, например, с помощью monit:
-
-`/etc/monit/conf.d/localhost`:
-```
-check process listener.rb
-matching "listener.rb"
-start program = "/bin/bash -c '/home/user/path/qb.sh'" as uid suer and gid group
-stop program = "/bin/bash -c 'killall listener.rb
-```
-
-`/home/user/path/qb.sh`:
-```
-#!/bin/bash
-
-. /home/user/path/export.sh
-/home/user/path/to/bin/listener.rb &
-```
-
-`/home/user/path/export.sh`:
-```
-export PATH=/home/bq/.rvm/gems/ruby-2.4.0/bin:/home/bq/.rvm/gems/ruby-2.4.0@global/bin:/usr/share/rvm/rubies/ruby-2.4.0/bin:/usr/share/rvm/bin:/home/bq/bin:/home/bq/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-export GEM_HOME=/home/bq/.rvm/gems/ruby-2.4.0
-export GEM_PATH=/home/bq/.rvm/gems/ruby-2.4.0:/home/bq/.rvm/gems/ruby-2.4.0@global
-export MY_RUBY_HOME=/usr/share/rvm/rubies/ruby-2.4.0
-export IRBRC=/usr/share/rvm/rubies/ruby-2.4.0/.irbrc
-```
-
+0. Запускается, например, с [помощью monit](https://github.com/M1chael/qb/wiki/Monit)
 1. Слушает сообщения из Telegram
 2. Учитывает результаты голосования в БД
 3. Отправляет уведомления проголосовавшим пользователям
