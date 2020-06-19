@@ -1,0 +1,9 @@
+version: '2.0'
+services:
+  qb:
+    container_name: qb
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./assets:/app/assets
+      - ./logs:/app/logs
