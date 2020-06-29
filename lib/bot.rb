@@ -19,7 +19,6 @@ class Bot
         msg.message = @response['result']['message_id']
       rescue => error
         @logger.fatal(error)
-        # @logger.debug("Message: \"#{msg.text}\"")
         @logger.debug("Request: {chat_id: #{@chat_id}, text: #{msg.text}, 
             reply_markup: #{markup(msg.score)}, parse_mode: 'Markdown'}")
       end
